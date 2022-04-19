@@ -3,6 +3,7 @@ import java.io.IOException;
 public class Main {
     public static void main(String[] args) {
 
+        System.out.println("Hello World!");
         VehicleType[] types = new VehicleType[]{new VehicleType("Bus", 1.2d),
                 new VehicleType("Car", 1.0d), new VehicleType("Rink", 1.5d),
                 new VehicleType("Tractor", 1.2d)};
@@ -101,7 +102,7 @@ public class Main {
             }
         }
         System.out.println("машина которая проедет максимальное расстояние");
-        System.out.println(maxRange.toString());
+        System.out.println(maxRange);
 
     }
 
