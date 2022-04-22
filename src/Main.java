@@ -123,21 +123,39 @@ public class Main {
         vc.display();
 */
 
-        VehicleCollection vc = new VehicleCollection("types", "vehicles", "rents");
-        WashQueue wq = new WashQueue();
+//        VehicleCollection vc = new VehicleCollection("types", "vehicles", "rents");
+//        WashQueue wq = new WashQueue();
+//
+//        for (Vehicle v : vc.VCollection) {
+//            wq.enqueue(v);
+//        }
+//
+//        int number = 0;
+//
+//        while (wq.size() != 0) {
+//            wq.dequeue();
+//            number++;
+//            System.out.println("Auto " + number + " вымыто");
+//        }
 
-        for (Vehicle v : vc.VCollection) {
-            wq.enqueue(v);
-        }
+        VehicleCollection vc = new VehicleCollection("types", "vehicles", "rents");
+        Stack garage = new Stack();
 
         int number = 0;
 
-        while (wq.size() != 0) {
-            wq.dequeue();
+        for (Vehicle v : vc.VCollection) {
+            garage.push(v);
             number++;
-            System.out.println("Auto " + number + " вымыто");
+            System.out.println("Auto " + number + " заехало в гараж");
         }
 
+        System.out.println("Гараж заполнен");
+
+        while (garage.size() != 0){
+            garage.pop();
+            System.out.println("Auto " + number + " выехало из гаража");
+            number--;
+        }
     }
 
     static class Display {
