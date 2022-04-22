@@ -1,12 +1,17 @@
 public class VehicleType {
+    private int id;
     private String name;
     private double coefficient;
 
     VehicleType() {}
 
-    VehicleType(String name, double coefficient) {
+    VehicleType( String name, double coefficient) {
         this.name = name;
         this.coefficient = coefficient;
+    }
+    VehicleType(int id, String name, double coefficient) {
+        this(name, coefficient);
+        this.id = id;
     }
 
     public String getName() {
@@ -32,5 +37,18 @@ public class VehicleType {
 
     public String getString() {
         return (name + ", \"" + coefficient + "\"");
+    }
+
+    @Override
+    public String toString() {
+        return (id + " " + name + ", \"" + coefficient + "\"");
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

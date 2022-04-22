@@ -1,4 +1,8 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Vehicle implements Comparable {
+    private int id;
     private final VehicleType vehicleType;
     private final String modelName;
     private String registrationNumber;
@@ -8,6 +12,8 @@ public class Vehicle implements Comparable {
     private Color color;
     private int volume;
     Startable engine;
+    private List<Rent> history;
+
 
     Vehicle() {
         vehicleType = null;
@@ -21,6 +27,7 @@ public class Vehicle implements Comparable {
         this.modelName = modelName;
         this.manufactureYear = manufactureYear;
         this.engine = engine;
+        history = new ArrayList<>();
         try {
             setRegistrationNumber(registrationNumber);
             setWeight(weight);
@@ -29,8 +36,13 @@ public class Vehicle implements Comparable {
         } catch (NotVehicleException e) {
             System.out.println(e.getMessage());
         }
+    }
 
-
+    Vehicle(int id, VehicleType vehicleType, String modelName, String registrationNumber, int weight,
+            int manufactureYear, int mileage, Color color, Startable engine) {
+        this(vehicleType, modelName, registrationNumber, weight,
+        manufactureYear, mileage, color, engine);
+        this.id = id;
     }
 
     public VehicleType getVehicleType() {
@@ -106,7 +118,7 @@ public class Vehicle implements Comparable {
     }
 
     public double getCalcTaxPerMonth() {
-        return ((weight * 0.0013d) + (vehicleType.getCoefficient() * engine.getTaxPerMonth() * 30) + 5);
+        return ((weight * 0.0013d) + (vehicleType.getCoefficient() * engine.getTaxCoefficient()* 30) + 5);
     }
 
     @Override
@@ -139,5 +151,33 @@ public class Vehicle implements Comparable {
         } else {
             return mileage - secondVehicle.getMileage();
         }
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public List<Rent> getHistory() {
+        return history;
+    }
+
+    public void setHistory(List<Rent> history) {
+        this.history = history;
+    }
+
+    public double getTotalIncome() {
+        double sum = 0.0;
+        for (Rent rent : history) {
+            sum += rent.getPrice();
+        }
+        return sum;
+    }
+
+    public double getTotalProfit() {
+        return getTotalIncome() - getCalcTaxPerMonth();
     }
 }
