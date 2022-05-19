@@ -1,12 +1,10 @@
-import com.opencsv.CSVParser;
-import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvException;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,12 +12,8 @@ import java.util.Map;
 public class MechanicService implements Fixer{
     private static String[] details = new String[] {"Filter", "Sleeve", "Shaft", "Axis", "Candle", "Oil", "GRM", "ShRUS"};
 
-    private static String PATH = "./orders.csv";
-
-    private static final CSVParser parserColon = new CSVParserBuilder()
-            .withSeparator(',')
-            .withIgnoreQuotations(true)
-            .build();
+    private static String PATH = "src/resources/orders.csv";
+    private static String PATH_COPY = "src/resources/ordersCopy.csv";
 
     @Override
     public Map<String, Integer> detectBreaking(Vehicle vehicle) {
@@ -51,29 +45,25 @@ public class MechanicService implements Fixer{
 
     @Override
     public void repair(Vehicle vehicle) {
-        List<String[]> lines = null;
+        String currentLine;
+        String vehicleId = Integer.toString(vehicle.getId());
 
-        try (CSVReader reader = new CSVReader(new FileReader(PATH))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(PATH_COPY));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(PATH))){
 
-            lines = reader.readAll();
-
-            for (int i = 1; i < lines.size(); i++) {
-                if (Integer.parseInt(lines.get(i)[0].trim()) == vehicle.getId())
-                    lines.remove(i);
+            while ((currentLine = reader.readLine()) != null && !currentLine.isEmpty()) {
+                if (vehicleId.equals(getId(currentLine))) {
+                    continue;
+                } else {
+                    writer.write(currentLine + "\n");
+                }
             }
 
-            CSVWriter writer = new CSVWriter(new FileWriter(PATH),
-                    ',',
-                    CSVWriter.NO_QUOTE_CHARACTER,
-                    ' ',
-                    "\n");
-
-            writer.writeAll(lines);
-            writer.close();
-
-        } catch (IOException | CsvException e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("File reading exception");
         }
+
+        copyOrdersFile();
     }
 
     @Override
@@ -89,7 +79,6 @@ public class MechanicService implements Fixer{
                     return true;
             }
 
-
         } catch (IOException | CsvException e) {
             e.printStackTrace();
         }
@@ -97,23 +86,18 @@ public class MechanicService implements Fixer{
         return false;
     }
 
-    private static int getRandomInteger(int min, int max) {
+    private int getRandomInteger(int min, int max) {
         return (int) ((Math.random() * ((max - min) + 1)) + min);
     }
 
     private void write(String str) {
-        try (CSVWriter writer = new CSVWriter(new FileWriter(PATH, true),
-                ',',
-                CSVWriter.NO_QUOTE_CHARACTER,
-                ' ',
-                "\n"))
-        {
-            String[] line = {str};
-            writer.writeNext(line, false);
-
+        try {
+            str += "\n";
+            Files.write(Paths.get(PATH),str.getBytes(), StandardOpenOption.APPEND);
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
+        copyOrdersFile();
     }
 
     public int findMost() {
@@ -146,5 +130,22 @@ public class MechanicService implements Fixer{
         }
 
         return id;
+    }
+
+    private String getId(String breakings) {
+        String id = breakings.substring(0, breakings.indexOf(','));
+        return id;
+    }
+
+    private void copyOrdersFile() {
+        String currentLine;
+        try (BufferedReader reader = new BufferedReader(new FileReader(PATH));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(PATH_COPY))){
+            while ((currentLine = reader.readLine()) != null && !currentLine.isEmpty()) {
+                writer.write(currentLine + "\n");
+            }
+        } catch (IOException e) {
+            System.out.println("File reading exception");
+        }
     }
 }
